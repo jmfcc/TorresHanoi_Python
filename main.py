@@ -172,12 +172,9 @@ count_Movs = [0]
 def generaDiscos(n_discos):
     global img_discos, discosT_A
     for i in range(n_discos):
-        # my_label_temp = tk.Label(ventana, image=img, bg="white")
         ruta = getSource()
         img = tk.PhotoImage(file=ruta+"\\src\\disco"+str(n_discos-i)+".png")
         img = img.subsample(2,2)
-        # print(img.width())
-        # print(img.height())  # constante 29
         img_discos.append([img, img.width()/2])
     for i in range(n_discos):
         discosT_A.append([tk.Label(ventana, image=img_discos[i][0]), img_discos[i][1]])
@@ -329,11 +326,11 @@ lbl_MovsMin = tk.Label(ventana, text="MOVIMIENTOS MINIMOS: 0", font=60)
 lbl_MovsMin.place(x= 880, y=70)
 
 ruta = []
-def iniciaRecorrido(altura, origen, destino, intermedio):
-    if altura >= 1:
-        iniciaRecorrido(altura-1, origen, intermedio, destino)
-        ruta.append([origen, destino])
-        iniciaRecorrido(altura-1, intermedio, destino, origen)
+def iniciaRecorrido(n_discos, salida, llegada, intermedio):
+    if n_discos >= 1:
+        iniciaRecorrido(n_discos-1, salida, intermedio, llegada)
+        ruta.append([salida, llegada])
+        iniciaRecorrido(n_discos-1, intermedio, llegada, salida)
 
 def recorrerMov(cont):
     if cont == 0:
@@ -366,7 +363,6 @@ def moverDisco(salida, llegada):
     elif salida == "C" and llegada == "B":
         discosT_B.append(discosT_C.pop(len(discosT_C)-1))
         muestraDiscos()
-
 
 def startAutoGame():
     sel = opr_cmbx.get()
