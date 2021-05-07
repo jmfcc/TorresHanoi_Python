@@ -51,12 +51,19 @@ def on_drop_motion(event):
                 if validaMov(origin, "B"):
                     discosT_B.append(discosT_A.pop(len(discosT_A)-1))
                     actualizaMov()
+                    muestraMensaje("")
+                else:
+                    muestraMensaje("MOVIMIENTO INVÁLIDO")
                 muestraDiscos()
             elif x >= 810 and x <= 1114:
                 quitaD_N_D()
                 if validaMov(origin, "C"):
                     discosT_C.append(discosT_A.pop(len(discosT_A)-1))
                     actualizaMov()
+                    muestraMensaje("")
+                    validaWin()
+                else:
+                    muestraMensaje("MOVIMIENTO INVÁLIDO")
                 muestraDiscos()
             else:
                 widget.place(x=posXYIni[0], y=posXYIni[1])
@@ -69,12 +76,19 @@ def on_drop_motion(event):
                 if validaMov(origin, "A"):
                     discosT_A.append(discosT_B.pop(len(discosT_B)-1))
                     actualizaMov()
+                    muestraMensaje("")
+                else:
+                    muestraMensaje("MOVIMIENTO INVÁLIDO")
                 muestraDiscos()
             elif x >= 810 and x <= 1114:
                 quitaD_N_D()
                 if validaMov(origin, "C"):
                     discosT_C.append(discosT_B.pop(len(discosT_B)-1))
                     actualizaMov()
+                    muestraMensaje("")
+                    validaWin()
+                else:
+                    muestraMensaje("MOVIMIENTO INVÁLIDO")
                 muestraDiscos()
             else:
                 widget.place(x=posXYIni[0], y=posXYIni[1])
@@ -87,12 +101,18 @@ def on_drop_motion(event):
                 if validaMov(origin, "A"):
                     discosT_A.append(discosT_C.pop(len(discosT_C)-1))
                     actualizaMov()
+                    muestraMensaje("")
+                else:
+                    muestraMensaje("MOVIMIENTO INVÁLIDO")
                 muestraDiscos()
             elif x >= 420 and x <= 724:
                 quitaD_N_D()
                 if validaMov(origin, "B"):
                     discosT_B.append(discosT_C.pop(len(discosT_C)-1))
                     actualizaMov()
+                    muestraMensaje("")
+                else:
+                    muestraMensaje("MOVIMIENTO INVÁLIDO")
                 muestraDiscos()
             else:
                 widget.place(x=posXYIni[0], y=posXYIni[1])
@@ -114,6 +134,13 @@ def on_drag_motion(event):
 def getSource():
     ruta = path.dirname(path.abspath(__file__)) #Obtiene la ruta del script en ejecución
     return ruta
+
+win = [False]
+def validaWin():
+    global win
+    if not discosT_A and not discosT_B:
+        muestraMensaje("PARTIDA GANADA!!!")
+        win[0] = True
 
 # GENERADOR DE TORRES
 img_bases = []
@@ -171,12 +198,14 @@ def quitaD_N_D():
         unmake_draggable(discosT_C[len(discosT_C)-1][0])
 
 def paintD(discos, ini_x):
+    global win
     ini_y = 412
     for d in discos:
         pos_x_ini = ini_x - d[1]
         d[0].place(x=pos_x_ini, y=ini_y)
         ini_y -= 31
-    usaD_N_D()
+    if not win[0]:
+        usaD_N_D()
 
 def muestraDiscos():
     global discosT_A, discosT_B, discosT_C
@@ -204,6 +233,8 @@ def resetAll():
     posXYIni.clear()
     count_Movs.clear()
     count_Movs.append(0)
+    win.clear()
+    win.append(False)
 
 def validaMov(salida, llegada):
     if salida == "A" and llegada == "B":
@@ -257,6 +288,9 @@ my_label = tk.Label(ventana, text="Ingrese la cantidad de discos a utilizar: ", 
 my_label.place(x= 35, y=30)
 lbl_Info = tk.Label(ventana, text="INICIAR JUEGO", font=20)
 lbl_Info.place(x= 525, y=550)
+
+def muestraMensaje(msg):
+    lbl_Info["text"]=msg
 
 opr_cmbx = ttk.Combobox(ventana, state="readonly", font=20, width=5)
 opr_cmbx["values"]=[1, 2, 3, 4, 5, 6, 7]
