@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from os import path
 from tkinter import ttk
@@ -21,7 +22,7 @@ def on_drag_start(event):
     posXYIni.clear()
     posXYIni.append(widget.winfo_x())
     posXYIni.append(widget.winfo_y())
-    print("Start x:", posXYIni[0], "  y:", posXYIni[1])
+    # print("Start x:", posXYIni[0], "  y:", posXYIni[1])
 
 areas = [
     [30,319,165,412], # Xi, Xf, Yi, Yf
@@ -43,7 +44,7 @@ def on_drop_motion(event):
     x = widget.winfo_x() 
     y = widget.winfo_y() 
     origin = obtainOrigin(posXYIni)
-    print("Origen", origin)
+    # print("Origen", origin)
     if origin == "A":
         if y >= 165 and y <= 412:
             if x >= 420 and x <= 724:
@@ -129,7 +130,7 @@ def on_drag_motion(event):
     y = widget.winfo_y() - widget._drag_start_y + event.y
     widget.place(x=x, y=y)
     # ventana.lift()
-    print("Drop x:", x," ", widget.winfo_x(), "-", widget._drag_start_x, "+", event.x, " ||  y:", y, " ", widget.winfo_y(), "-", widget._drag_start_y, "+", event.y)
+    # print("Drop x:", x," ", widget.winfo_x(), "-", widget._drag_start_x, "+", event.x, " ||  y:", y, " ", widget.winfo_y(), "-", widget._drag_start_y, "+", event.y)
 
 def getSource():
     ruta = path.dirname(path.abspath(__file__)) #Obtiene la ruta del script en ejecución
@@ -311,6 +312,8 @@ def startGame():
         generaDiscos(sel)
         muestraDiscos()
         partidaG[0] = True
+    else:
+        muestraMensaje("SELECCIONE UNA CANTIDAD DE DISCOS A USAR")
 
 btn = tk.Button(ventana, text = "Iniciar Juego", width=15, command=startGame)
 btn.place(x=395, y= 30)
@@ -324,5 +327,70 @@ lbl_Movs = tk.Label(ventana, text="MOVIMIENTOS REALIZADOS: 0", font=60)
 lbl_Movs.place(x=880, y=30)
 lbl_MovsMin = tk.Label(ventana, text="MOVIMIENTOS MINIMOS: 0", font=60)
 lbl_MovsMin.place(x= 880, y=70)
+
+ruta = []
+def iniciaRecorrido(altura, origen, destino, intermedio):
+    if altura >= 1:
+        iniciaRecorrido(altura-1, origen, intermedio, destino)
+        ruta.append([origen, destino])
+        iniciaRecorrido(altura-1, intermedio, destino, origen)
+
+def recorrerMov(cont):
+    if cont == 0:
+        muestraDiscos()
+        muestraMensaje("JUEGO AUTOMÁTICO")
+    elif cont-1 < len(ruta):
+        moverDisco(ruta[cont-1][0], ruta[cont-1][1])
+        actualizaMov()
+    else:
+        return
+    cont+=1
+    ventana.after(800, recorrerMov, cont)
+
+def moverDisco(salida, llegada):
+    if salida == "A" and llegada == "B":
+        discosT_B.append(discosT_A.pop(len(discosT_A)-1))
+        muestraDiscos()
+    elif salida == "A" and llegada == "C":
+        discosT_C.append(discosT_A.pop(len(discosT_A)-1))
+        muestraDiscos()
+    elif salida == "B" and llegada == "A":
+        discosT_A.append(discosT_B.pop(len(discosT_B)-1))
+        muestraDiscos()
+    elif salida == "B" and llegada == "C":
+        discosT_C.append(discosT_B.pop(len(discosT_B)-1))
+        muestraDiscos()
+    elif salida == "C" and llegada == "A":
+        discosT_A.append(discosT_C.pop(len(discosT_C)-1))
+        muestraDiscos()
+    elif salida == "C" and llegada == "B":
+        discosT_B.append(discosT_C.pop(len(discosT_C)-1))
+        muestraDiscos()
+
+
+def startAutoGame():
+    sel = opr_cmbx.get()
+    global partidaG
+    if sel:
+        sel = int(sel)
+        if partidaG[0]:
+            resetAll()
+            partidaG[0] = False
+            ruta.clear()
+        calculaMovMin(sel)
+        lbl_Movs["text"]="MOVIMIENTOS REALIZADOS: " + str(count_Movs[0])
+        lbl_MovsMin["text"]="MOVIMIENTOS MINIMOS: " + str(count_Movs[1])
+        generaDiscos(sel)
+        muestraDiscos()
+        partidaG[0] = True
+        win[0]=True
+        time.sleep(1)
+        iniciaRecorrido(sel, "A", "C", "B")
+        recorrerMov(0)
+    else:
+        muestraMensaje("SELECCIONE UNA CANTIDAD DE DISCOS A USAR")
+
+btn_Auto = tk.Button(ventana, text = "Mostrar Movimientos", width=18, command=startAutoGame)
+btn_Auto.place(x=523, y= 30)
 
 ventana.mainloop()
