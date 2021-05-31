@@ -178,7 +178,7 @@ def generaDiscos(n_discos): # Genera las imagenes y labels de los discos
     for i in range(n_discos):
         discosT_A.append([tk.Label(ventana, image=img_discos[i][0]), img_discos[i][1]])
 
-def usaD_N_D(): # Aplica la propiedad DND a todos los discos de cada palo
+def usaD_N_D(): # Aplica la propiedad DND a los discos superiores de cada palo
     if discosT_A:
         make_draggable(discosT_A[len(discosT_A)-1][0])
     if discosT_B:
